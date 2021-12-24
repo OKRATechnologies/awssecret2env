@@ -1,6 +1,6 @@
 common-job-attribues: &common-job-attributes
   docker:
-    - image: circleci/golang:1.14
+    - image: cimg/golang:1.14
 
 install-aws-cli: &install-aws-cli
   run:
