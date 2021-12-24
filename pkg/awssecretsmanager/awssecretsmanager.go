@@ -33,7 +33,8 @@ func GetAWSRegion() string {
 func GetAWSSecret(name string) (Secret, error) {
 
 	//Create a Secrets Manager client
-	svc := secretsmanager.New(session.New(), aws.NewConfig().WithRegion(region))
+	sess := session.Must(session.NewSession())
+	svc := secretsmanager.New(sess, aws.NewConfig().WithRegion(region))
 	input := &secretsmanager.GetSecretValueInput{
 		SecretId:     aws.String(name),
 		VersionStage: aws.String("AWSCURRENT"),
