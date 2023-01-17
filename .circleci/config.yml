@@ -1,38 +1,42 @@
 common-job-attribues: &common-job-attributes
   docker:
     - image: circleci/golang:1.17
-
 install-aws-cli: &install-aws-cli
   run:
     name: Install AWS CLI
     command: |
       sudo apt-get install -y python3-pip
       sudo pip3 install --upgrade awscli
-
 version: 2.1
 jobs:
   master:
-    <<: *common-job-attributes
+    !!merge <<: *common-job-attributes
     steps:
       - checkout
-      - <<: *install-aws-cli
+      - aws-cli/setup:
+          role-arn: arn:aws:iam::998607346652:role/circleci_openid
+      - !!merge <<: *install-aws-cli
       - run:
           name: Build and upload master
           command: |
             make env
             source .env
             make master
+    circleci_ip_ranges: true
   release:
-    <<: *common-job-attributes
+    !!merge <<: *common-job-attributes
     steps:
       - checkout
-      - <<: *install-aws-cli
+      - aws-cli/setup:
+          role-arn: arn:aws:iam::998607346652:role/circleci_openid
+      - !!merge <<: *install-aws-cli
       - run:
           name: Build and upload tagged release
           command: |
             make env
             source .env
             make release
+    circleci_ip_ranges: true
 workflows:
   build-and-upload-master:
     jobs:
@@ -49,3 +53,5 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
+orbs:
+  aws-cli: circleci/aws-cli@3.1
